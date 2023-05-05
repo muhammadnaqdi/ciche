@@ -103,45 +103,48 @@ int main(int argc, char *argv[]) {
   bool backtrack = false;
   
   while (stack->size > 0) {
-    if (!backtrack) {
-      ciche_doubly_pick_tail_obj(stack, (void **) &sobj);
-      prule = sobj->prule;
-      sobj->symbol_index ++;
-      symbol = ((char *)sobj->current_rule->obj)[sobj->symbol_index];
-      if (symbol == '\0') {
-	ciche_doubly_remove_and_free_tail(stack, &stack_obj_free);
-	continue;
-      } else {
-	if (symbol > 90) {
-	  if (symbol == scanner_token(scan)) {
-	    continue;
-	  } else {
-	    backtrack = true;
-	    continue;
-	  }
-	} else {
-	  ciche_doubly_insert_at_tail(stack, (void *) stack_obj_create(prules[symbol], scan));
-	  continue;
-	}
-      }
-    } else {
+    ciche_doubly_pick_tail_obj(stack, (void **) &sobj);
+    prule = sobj->prule;
+    if (backtrack) {
       if (sobj->current_rule->next != NULL) {
 	sobj->symbol_index = -1;
 	scan->head = sobj->start_head;
 	sobj->current_rule = sobj->current_rule->next;
 	backtrack = false;
-	continue;
       } else {
-	sobj->symbol_index = -1;
-	scan->head = sobj->start_head;
 	ciche_doubly_remove_and_free_tail(stack, &stack_obj_free);
-	backtrack = false;
+	continue;
+      }
+    }
+    sobj->symbol_index ++;
+    symbol = ((char *)sobj->current_rule->obj)[sobj->symbol_index];
+    if (symbol == '\0') {
+      ciche_doubly_remove_and_free_tail(stack, &stack_obj_free);
+      continue;
+    } else {
+      if (symbol > 90) {
+	if (symbol == scanner_token(scan)) {
+	  continue;
+	} else {
+	  if (sobj->current_rule->next != NULL) {
+	    sobj->symbol_index = -1;
+	    scan->head = sobj->start_head;
+	    sobj->current_rule = sobj->current_rule->next;
+	    continue;
+	  } else {
+	    ciche_doubly_remove_and_free_tail(stack, &stack_obj_free);
+	    backtrack = true;
+	    continue;
+	  }
+	}
+      } else {
+	ciche_doubly_insert_at_tail(stack, (void *) stack_obj_create(prules[symbol], scan));
 	continue;
       }
     }
   }
 
-  printf("%d", scan->input[scan->head] == '\0');
+  puts(scan->input[scan->head] == '\0' ? "SUCCESS" : "FAILURE");
   
   return EXIT_SUCCESS;
 }
