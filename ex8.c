@@ -1,3 +1,7 @@
+/*
+@author Muhammad Naqdi
+*/
+
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdarg.h>
@@ -101,8 +105,13 @@ int main(int argc, char *argv[]) {
   char *string;
   char symbol;
   bool backtrack = false;
+
+#define PRINTREST(action)					                        	\
+  printf("ACTION:  %s\n", action);			                        		\
+  printf("STACK:  |%c|%d|%d|\n", prule->tag, (int) sobj->symbol_index, (int) sobj->start_head); \
   
   while (stack->size > 0) {
+    puts("------------------------------------------");
     ciche_doubly_pick_tail_obj(stack, (void **) &sobj);
     prule = sobj->prule;
     if (backtrack) {
@@ -118,26 +127,34 @@ int main(int argc, char *argv[]) {
     }
     sobj->symbol_index ++;
     symbol = ((char *)sobj->current_rule->obj)[sobj->symbol_index];
+
+    printf("PRODUCTION RULE:  %c\nCURRENT SYMBOL:  %c\n", prule->tag, symbol == '\0' ? '-' : symbol);
+    
     if (symbol == '\0') {
+      PRINTREST("POP")
       ciche_doubly_remove_and_free_tail(stack, &stack_obj_free);
       continue;
     } else {
       if (symbol > 90) {
 	if (symbol == scanner_token(scan)) {
+	  PRINTREST("ADVANCE")
 	  continue;
 	} else {
 	  if (sobj->current_rule->next != NULL) {
+	    PRINTREST("BACKTRACK")
 	    sobj->symbol_index = -1;
 	    scan->head = sobj->start_head;
 	    sobj->current_rule = sobj->current_rule->next;
 	    continue;
 	  } else {
+	    PRINTREST("BACKTRACK & POP")
 	    ciche_doubly_remove_and_free_tail(stack, &stack_obj_free);
 	    backtrack = true;
 	    continue;
 	  }
 	}
       } else {
+	PRINTREST("PUSH")
 	ciche_doubly_insert_at_tail(stack, (void *) stack_obj_create(prules[symbol], scan));
 	continue;
       }
