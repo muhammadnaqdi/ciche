@@ -39,11 +39,11 @@ bool ciche_doubly_init(struct ciche_doubly *doubly) {
   return true;
 }
 
-bool ciche_doubly_node_free(struct ciche_doubly_node *node, void* obj) {
+bool ciche_doubly_node_free(struct ciche_doubly_node *node, void **obj) {
   if (node == NULL)
     return false;
   
-  obj = node->obj;
+  *obj = node->obj;
   
   free(node);
 
@@ -139,11 +139,11 @@ bool ciche_doubly_insert_at_tail(struct ciche_doubly *doubly, void *obj) {
   return true;
 }
 
-bool ciche_doubly_remove_at_head(struct ciche_doubly *doubly, struct ciche_doubly_node *node) {
+bool ciche_doubly_remove_head(struct ciche_doubly *doubly, void **obj) {
   if (doubly == NULL || doubly->size == 0)
     return false;
 
-  node = doubly->head;
+  struct ciche_doubly_node *tmp = doubly->head;
 
   if (doubly->size > 1) {
     doubly->head = doubly->head->next;
@@ -154,16 +154,18 @@ bool ciche_doubly_remove_at_head(struct ciche_doubly *doubly, struct ciche_doubl
   }
 
   doubly->size --;
+
+  ciche_doubly_node_free(tmp, obj);
   
   return true;
 }
 
 
-bool ciche_doubly_remove_at_tail(struct ciche_doubly *doubly, struct ciche_doubly_node *node) {
+bool ciche_doubly_remove_tail(struct ciche_doubly *doubly, void **obj) {
   if (doubly == NULL || doubly->size == 0)
     return false;
 
-  node = doubly->tail;
+  struct ciche_doubly_node *tmp = doubly->tail;
 
   if (doubly->size > 1) {
     doubly->tail = doubly->tail->prev;
@@ -174,25 +176,89 @@ bool ciche_doubly_remove_at_tail(struct ciche_doubly *doubly, struct ciche_doubl
   }
 
   doubly->size --;
+
+  ciche_doubly_node_free(tmp, obj);
   
   return true;
 }
 
-bool ciche_doubly_pick_head(struct ciche_doubly *doubly, struct ciche_doubly_node *node) {
+bool ciche_doubly_remove_and_free_head(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
+  if (doubly == NULL || doubly->size == 0)
+    return false;
+
+  struct ciche_doubly_node *tmp = doubly->head;
+
+  if (doubly->size > 1) {
+    doubly->head = doubly->head->next;
+    doubly->head->prev = NULL;
+  } else {
+    doubly->head = NULL;
+    doubly->tail = NULL;
+  }
+
+  doubly->size --;
+
+  ciche_doubly_node_deep_free(tmp, obj_free);
+  
+  return true;
+}
+
+
+bool ciche_doubly_remove_and_free_tail(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
+  if (doubly == NULL || doubly->size == 0)
+    return false;
+
+  struct ciche_doubly_node *tmp = doubly->tail;
+
+  if (doubly->size > 1) {
+    doubly->tail = doubly->tail->prev;
+    doubly->tail->next = NULL;
+  } else {
+    doubly->head = NULL;
+    doubly->tail = NULL;
+  }
+
+  doubly->size --;
+
+  ciche_doubly_node_deep_free(tmp, obj_free);
+  
+  return true;
+}
+
+bool ciche_doubly_pick_head(struct ciche_doubly *doubly, struct ciche_doubly_node **node) {
   if (doubly == NULL || doubly->head == NULL)
     return false;
 
-  node = doubly->head;
+  *node = doubly->head;
 
   return true;
 }
 
 
-bool ciche_doubly_pick_tail(struct ciche_doubly *doubly, struct ciche_doubly_node *node) {
+bool ciche_doubly_pick_tail(struct ciche_doubly *doubly, struct ciche_doubly_node **node) {
   if (doubly == NULL || doubly->tail == NULL)
     return false;
 
-  node = doubly->tail;
+  *node = doubly->tail;
+
+  return true;
+}
+
+bool ciche_doubly_pick_head_obj(struct ciche_doubly *doubly, void **obj) {
+  if (doubly == NULL || doubly->head == NULL)
+    return false;
+
+  *obj = doubly->head->obj;
+
+  return true;
+}
+
+
+bool ciche_doubly_pick_tail_obj(struct ciche_doubly *doubly, void **obj) {
+  if (doubly == NULL || doubly->tail == NULL)
+    return false;
+
+  *obj = doubly->tail->obj;
 
   return true;
 }
