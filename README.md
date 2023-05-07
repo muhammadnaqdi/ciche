@@ -1,2 +1,2 @@
 # ciche
-A small compiler for a tiny C-like language
+An educational compiler for a tiny C-like language
