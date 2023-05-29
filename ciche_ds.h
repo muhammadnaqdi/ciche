@@ -11,12 +11,6 @@ struct ciche_doubly_node {
   struct ciche_doubly_node *prev;
 };
 
-struct ciche_doubly {
-  size_t size;
-  struct ciche_doubly_node *head;
-  struct ciche_doubly_node *tail;
-};
-
 bool ciche_doubly_node_init(struct ciche_doubly_node *node) {
   if (node == NULL)
     return false;
@@ -25,17 +19,6 @@ bool ciche_doubly_node_init(struct ciche_doubly_node *node) {
   node->next = NULL;
   node->prev = NULL;
 
-  return true;
-}
-
-bool ciche_doubly_init(struct ciche_doubly *doubly) {
-  if (doubly == NULL)
-    return false;
-  
-  doubly->size = 0;
-  doubly->head = NULL;
-  doubly->tail = NULL;
-  
   return true;
 }
 
@@ -50,15 +33,6 @@ bool ciche_doubly_node_free(struct ciche_doubly_node *node, void **obj) {
   return true;
 }
 
-bool ciche_doubly_free(struct ciche_doubly *doubly) {
-  if (doubly == NULL)
-    return false;
-  
-  free(doubly);
-  
-  return true;
-}
-
 bool ciche_doubly_node_deep_free(struct ciche_doubly_node *node, bool (*obj_free)(void *)) {
   if (node == NULL || obj_free == NULL)
     return false;
@@ -70,27 +44,21 @@ bool ciche_doubly_node_deep_free(struct ciche_doubly_node *node, bool (*obj_free
   return result;
 }
 
-bool ciche_doubly_deep_free(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) {
-  if (doubly == NULL || obj_free == NULL)
+struct ciche_doubly {
+  size_t size;
+  struct ciche_doubly_node *head;
+  struct ciche_doubly_node *tail;
+};
+
+bool ciche_doubly_init(struct ciche_doubly *doubly) {
+  if (doubly == NULL)
     return false;
-
-  bool result = true;
-
-  if (doubly->size > 0) {
-    struct ciche_doubly_node *tmp = NULL;
-    for (int i = 1; i < doubly->size; ++i) {
-      tmp = doubly->head;
-      doubly->head = doubly->head->next;
-
-      result &= ciche_doubly_node_deep_free(tmp, obj_free);
-    }
-    
-    result &= ciche_doubly_node_deep_free(doubly->head, obj_free);
-  }
-
-  free(doubly);
   
-  return result;
+  doubly->size = 0;
+  doubly->head = NULL;
+  doubly->tail = NULL;
+  
+  return true;
 }
 
 bool ciche_doubly_insert_at_head(struct ciche_doubly *doubly, void *obj) {
@@ -136,6 +104,44 @@ bool ciche_doubly_insert_at_tail(struct ciche_doubly *doubly, void *obj) {
 
   doubly->size ++;
   
+  return true;
+}
+
+bool ciche_doubly_pick_head(struct ciche_doubly *doubly, struct ciche_doubly_node **node) {
+  if (doubly == NULL || doubly->head == NULL)
+    return false;
+
+  *node = doubly->head;
+
+  return true;
+}
+
+
+bool ciche_doubly_pick_tail(struct ciche_doubly *doubly, struct ciche_doubly_node **node) {
+  if (doubly == NULL || doubly->tail == NULL)
+    return false;
+
+  *node = doubly->tail;
+
+  return true;
+}
+
+bool ciche_doubly_pick_head_obj(struct ciche_doubly *doubly, void **obj) {
+  if (doubly == NULL || doubly->head == NULL)
+    return false;
+
+  *obj = doubly->head->obj;
+
+  return true;
+}
+
+
+bool ciche_doubly_pick_tail_obj(struct ciche_doubly *doubly, void **obj) {
+  if (doubly == NULL || doubly->tail == NULL)
+    return false;
+
+  *obj = doubly->tail->obj;
+
   return true;
 }
 
@@ -225,42 +231,51 @@ bool ciche_doubly_remove_and_free_tail(struct ciche_doubly *doubly, bool (*obj_f
   return true;
 }
 
-bool ciche_doubly_pick_head(struct ciche_doubly *doubly, struct ciche_doubly_node **node) {
-  if (doubly == NULL || doubly->head == NULL)
+bool ciche_doubly_free(struct ciche_doubly *doubly) {
+  if (doubly == NULL)
     return false;
-
-  *node = doubly->head;
-
+  
+  free(doubly);
+  
   return true;
 }
 
-
-bool ciche_doubly_pick_tail(struct ciche_doubly *doubly, struct ciche_doubly_node **node) {
-  if (doubly == NULL || doubly->tail == NULL)
+bool ciche_doubly_clean(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) {
+  if (doubly == NULL || obj_free == NULL)
     return false;
 
-  *node = doubly->tail;
+  bool result = true;
 
-  return true;
+   while (doubly->size > 0) {
+     result &= ciche_doubly_remove_and_free_tail(doubly, obj_free);
+   }
+  
+   return result;
 }
 
-bool ciche_doubly_pick_head_obj(struct ciche_doubly *doubly, void **obj) {
-  if (doubly == NULL || doubly->head == NULL)
+bool ciche_doubly_clean_optimized(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) {
+  if (doubly == NULL || obj_free == NULL)
     return false;
 
-  *obj = doubly->head->obj;
+  bool result = true;
 
-  return true;
-}
+   if (doubly->size > 0) {
+    struct ciche_doubly_node *tmp = NULL;
+    for (int i = 1; i < doubly->size; ++i) {
+      tmp = doubly->head;
+      doubly->head = doubly->head->next;
 
+      result &= ciche_doubly_node_deep_free(tmp, obj_free);
+    }
+    
+    result &= ciche_doubly_node_deep_free(doubly->head, obj_free);
+    }
 
-bool ciche_doubly_pick_tail_obj(struct ciche_doubly *doubly, void **obj) {
-  if (doubly == NULL || doubly->tail == NULL)
-    return false;
-
-  *obj = doubly->tail->obj;
-
-  return true;
+   doubly->head = NULL;
+   doubly->tail = NULL;
+   doubly->size = 0;
+  
+   return result;
 }
 
 #endif /* CICHE_DS_H */
