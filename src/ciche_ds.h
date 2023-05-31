@@ -236,7 +236,7 @@ bool ciche_doubly_remove_tail(struct ciche_doubly *doubly, void **obj) {
   return true;
 }
 
-bool ciche_doubly_remove_head_and_free(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
+bool ciche_doubly_remove_and_free_head(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
   if (doubly == NULL || doubly->size <= 0)
     return false;
 
@@ -258,7 +258,7 @@ bool ciche_doubly_remove_head_and_free(struct ciche_doubly *doubly, bool (*obj_f
 }
 
 
-bool ciche_doubly_remove_tail_and_free(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
+bool ciche_doubly_remove_and_free_tail(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
   if (doubly == NULL || doubly->size <= 0)
     return false;
 
@@ -312,13 +312,13 @@ bool ciche_doubly_remove_node_and_free(struct ciche_doubly *doubly, struct ciche
   n = node->next;
 
   if (p == NULL && n == NULL)
-    return ciche_doubly_remove_head_and_free(doubly, obj_free);
+    return ciche_doubly_remove_and_free_head(doubly, obj_free);
 
   if (p == NULL)
-    return ciche_doubly_remove_head_and_free(doubly, obj_free);
+    return ciche_doubly_remove_and_free_head(doubly, obj_free);
 
   if (n == NULL)
-    return ciche_doubly_remove_tail_and_free(doubly, obj_free);
+    return ciche_doubly_remove_and_free_tail(doubly, obj_free);
 
   p->next = n;
   n->prev = p;
@@ -414,7 +414,7 @@ bool ciche_doubly_clean(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) 
   bool result = true;
 
    while (doubly->size > 0) {
-     result &= ciche_doubly_remove_tail_and_free(doubly, obj_free);
+     result &= ciche_doubly_remove_and_free_tail(doubly, obj_free);
    }
   
    return result;
