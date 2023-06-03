@@ -439,7 +439,7 @@ bool ciche_doubly_free(struct ciche_doubly *doubly) {
   return true;
 }
 
-bool ciche_doubly_deep_free(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
+bool ciche_doubly_clean_and_deep_free(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
   if (!doubly || doubly->size < 0)
     return false;
 
@@ -447,13 +447,11 @@ bool ciche_doubly_deep_free(struct ciche_doubly *doubly, bool (*obj_free)(void *
 
    while (doubly->size > 0)
      result &= ciche_doubly_remove_and_deep_free_tail(doubly, obj_free);
-
-   free(doubly);
    
    return result;
 }
 
-bool ciche_doubly_deep_free_optimized(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) {
+bool ciche_doubly_clean_deep_free_optimized(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) {
   if (!doubly || doubly->size < 0)
     return false;
 
@@ -473,8 +471,6 @@ bool ciche_doubly_deep_free_optimized(struct ciche_doubly *doubly,  bool (*obj_f
    doubly->head = NULL;
    doubly->tail = NULL;
    doubly->size = 0;
-
-   free(doubly);
   
    return result;
 }
