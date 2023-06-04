@@ -38,40 +38,43 @@ bool ciche_tree_add_child(struct ciche_tree_node *node, void *obj) {
       return false;
   }
 
-  struct ciche_tree_node *tmp = malloc(sizeof(struct ciche_tree_node *));
-  if (!tmp)
+  struct ciche_tree_node *new = malloc(sizeof(struct ciche_tree_node *));
+  if (!new)
     return false;
-  if (!ciche_tree_node_init(tmp))
+  if (!ciche_tree_node_init(new))
     return false;
-  tmp->obj = obj;
-  tmp->parrent = node;
+  new->obj = obj;
+  new->parrent = node;
   
-  return ciche_doubly_insert_at_tail(node->children, tmp);
+  return ciche_doubly_insert_at_tail(node->children, new);
 }
 
 bool ciche_tree_dfs(struct ciche_tree_node *node, struct ciche_doubly *visit) {
   if (!node || !visit)
     return false;
 
-  struct ciche_doubly stack;
-  if (!ciche_doubly_init(&stack))
+  struct ciche_doubly *stack = (struct ciche_doubly *) malloc(sizeof(struct ciche_doubly));
+  if (!ciche_doubly_init(stack))
     return false;
 
-  ciche_stack_push(&stack, node);
-  
-  while (stack.size > 0) {
-    ciche_stack_pop_and_free(&stack, (void **) &node);
+  ciche_stack_push(stack, node);
+
+  struct ciche_doubly_node *tmp = NULL;
+  while (stack->size > 0) {
+    ciche_stack_pop_and_free(stack, (void **) &node);
     ciche_stack_push(visit, node);
 
     if (!node->children)
       continue;
     
-    struct ciche_doubly_node *tmp = node->children->tail;
+    tmp = node->children->tail;
     while (tmp) {
-      ciche_stack_push(&stack, tmp->obj);
+      ciche_stack_push(stack, tmp->obj);
       tmp = tmp->prev;
     }
   }
+
+  ciche_doubly_free(stack);
   
   return true;
 }
@@ -80,14 +83,14 @@ bool ciche_tree_bfs(struct ciche_tree_node *node, struct ciche_doubly *visit) {
   if (!node || !visit)
     return false;
 
-  struct ciche_doubly queue;
-  if (!ciche_doubly_init(&queue))
+  struct ciche_doubly *queue = (struct ciche_doubly *) malloc(sizeof(struct ciche_doubly));
+  if (!ciche_doubly_init(queue))
     return false;
 
-  ciche_queue_add(&queue, node);
+  ciche_queue_add(queue, node);
   
-  while (queue.size > 0) {
-    ciche_queue_remove_and_free(&queue, (void **) &node);
+  while (queue->size > 0) {
+    ciche_queue_remove_and_free(queue, (void **) &node);
     ciche_queue_add(visit, node);
 
     if (!node->children)
@@ -95,11 +98,13 @@ bool ciche_tree_bfs(struct ciche_tree_node *node, struct ciche_doubly *visit) {
     
     struct ciche_doubly_node *tmp = node->children->head;
     while (tmp) {
-      ciche_queue_add(&queue, tmp->obj);
+      ciche_queue_add(queue, tmp->obj);
       tmp = tmp->next;
     }
   }
 
+  ciche_doubly_free(queue);
+  
   return true;
 }
 
@@ -113,19 +118,24 @@ bool ciche_tree_remove(struct ciche_tree_node *node, bool (*node_equals)(void *,
 
 bool ciche_tree_remove_deep_free(struct ciche_tree_node *node, bool (*node_equals)(void *, void *), bool (*node_free)(void *)) {
   struct ciche_tree_node *p = node->parrent;
+  
   if (p)
     if(!ciche_doubly_find_and_remove_and_free(p->children, node, node_equals))
       return false;
 
-  struct ciche_doubly visit;
-  if (!ciche_doubly_init(&visit))
+  struct ciche_doubly *visit = (struct ciche_doubly *) malloc(sizeof(struct ciche_doubly));
+  if (!visit)
+    return false;
+  if (!ciche_doubly_init(visit))
       return false;
 
-  if (!ciche_tree_dfs(node, &visit))
+  if (!ciche_tree_dfs(node, visit))
     return false;
 
-  if (!ciche_doubly_clean_and_deep_free(&visit, node_free))
+  if (!ciche_doubly_clear_and_deep_free(visit, node_free))
     return false;
+
+  ciche_doubly_free(visit);
   
   return true;
 }

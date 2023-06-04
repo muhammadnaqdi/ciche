@@ -3,6 +3,8 @@
 
 #include "ciche_doubly.h"
 
+#include <stdint.h>
+
 #define HASH_MAP_SIZE 8192
 struct ciche_hash_map {
   struct ciche_doubly *map[HASH_MAP_SIZE];
@@ -18,8 +20,8 @@ bool ciche_hash_map_init(struct ciche_hash_map *hmap) {
   return true;
 }
 
-bool ciche_hash_map_add(struct ciche_hash_map *hmap, void *obj, size_t (*obj_hash)(void *)) {
-  size_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (size_t) obj % HASH_MAP_SIZE;
+bool ciche_hash_map_add(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *)) {
+  uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
 
   if (!doubly) {
@@ -31,22 +33,22 @@ bool ciche_hash_map_add(struct ciche_hash_map *hmap, void *obj, size_t (*obj_has
   return ciche_doubly_insert_at_tail(doubly, obj);
 }
 
-bool ciche_hash_find(struct ciche_hash_map *hmap, void *obj, size_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
-  size_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (size_t) obj % HASH_MAP_SIZE;
+bool ciche_hash_find(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
+  uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
 
   return ciche_doubly_find(doubly, obj, obj_equals, node);
 }
 
-bool ciche_hash_find_obj(struct ciche_hash_map *hmap, void *obj, size_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), void **fobj) {
-  size_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (size_t) obj % HASH_MAP_SIZE;
+bool ciche_hash_find_obj(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), void **fobj) {
+  uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
   
   return ciche_doubly_find_obj(doubly, obj, obj_equals, fobj);
 }
 
-bool ciche_hash_map_remove(struct ciche_hash_map *hmap, void *obj, size_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
-  size_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (size_t) obj % HASH_MAP_SIZE;
+bool ciche_hash_map_remove(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
+  uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
   
   if (!ciche_doubly_find_and_remove(doubly, obj, obj_equals, node))
@@ -60,8 +62,8 @@ bool ciche_hash_map_remove(struct ciche_hash_map *hmap, void *obj, size_t (*obj_
   return true;
 }
 
-bool ciche_hash_map_remove_and_free(struct ciche_hash_map *hmap, void *obj, size_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *)) {
-  size_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (size_t) obj % HASH_MAP_SIZE;
+bool ciche_hash_map_remove_and_free(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *)) {
+  uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
 
   if (!ciche_doubly_find_and_remove_and_free(doubly, obj, obj_equals))
@@ -75,8 +77,8 @@ bool ciche_hash_map_remove_and_free(struct ciche_hash_map *hmap, void *obj, size
   return true;
 }
 
-bool ciche_hash_map_remove_and_deep_free(struct ciche_hash_map *hmap, void *obj, size_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), bool (*obj_free)(void *)) {
-  size_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (size_t) obj % HASH_MAP_SIZE;
+bool ciche_hash_map_remove_and_deep_free(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), bool (*obj_free)(void *)) {
+  uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
 
   if (!ciche_doubly_find_and_remove_and_deep_free(doubly, obj, obj_equals, obj_free))
