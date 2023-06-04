@@ -247,7 +247,7 @@ bool ciche_doubly_find_obj(struct ciche_doubly *doubly, void *obj, bool (*obj_eq
   if (obj_equals) {
     while (node) {
       if (obj_equals(node->obj, obj)) {
-	fobj = node->obj;
+	*fobj = node->obj;
 	return true;
       }
 
@@ -256,7 +256,7 @@ bool ciche_doubly_find_obj(struct ciche_doubly *doubly, void *obj, bool (*obj_eq
   } else {
     while (node) {
       if (node->obj == obj) {
-	fobj = node->obj;
+	*fobj = node->obj;
 	return true;
       }
 
