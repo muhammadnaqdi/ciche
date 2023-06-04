@@ -120,7 +120,7 @@ bool ciche_doubly_insert_before(struct ciche_doubly *doubly, struct ciche_doubly
     return false;
 
   struct ciche_doubly_node *tmp = (struct ciche_doubly_node *) malloc(sizeof(struct ciche_doubly_node));
-  if (!node)
+  if (!tmp)
     return false;
   
   if (!ciche_doubly_node_init(tmp))
@@ -147,14 +147,14 @@ bool ciche_doubly_insert_after(struct ciche_doubly *doubly, struct ciche_doubly_
     return false;
 
   struct ciche_doubly_node *tmp = (struct ciche_doubly_node *) malloc(sizeof(struct ciche_doubly_node));
-  if (!node)
+  if (!tmp)
     return false;
   
   if (!ciche_doubly_node_init(tmp))
     return false;
   tmp->obj = obj;
 
-  struct ciche_doubly_node *n = node->prev;
+  struct ciche_doubly_node *n = node->next;
   
   if (!n) {
     ciche_doubly_insert_at_tail(doubly, obj);
@@ -267,53 +267,6 @@ bool ciche_doubly_find_obj(struct ciche_doubly *doubly, void *obj, bool (*obj_eq
   return false;
 }
 
-/* This one is kind of tricky. Shude be used on one list at a time. I have no intention to test it.*/
-// bool ciche_doubly_find_next(bool reset, struct ciche_doubly *doubly, void *obj, bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
-//   static size_t found = 0;
-//   if (reset)
-//     found = 0;
-//   int c = 0;
-
-//   if (!doubly || doubly->size <= 0)
-//     return false;
-
-//   struct ciche_doubly_node *tmp = doubly->head;
-
-//   if (obj_equals) {
-//     while (tmp) {
-//       if (obj_equals(tmp->obj, obj)) {
-// 	if (c < found) {
-// 	  c ++;
-// 	} else {
-// 	  found ++;
-// 	  if (node)
-// 	    *node = tmp;
-// 	  return true;
-// 	}
-//       }
-
-//       tmp = tmp->next;
-//     }
-//   } else {
-//     while (tmp) {
-//       if (tmp->obj == obj) {
-// 	if (c < found) {
-// 	  c ++;
-// 	} else {
-// 	  found ++;
-// 	  if (node)
-// 	    *node = tmp;
-// 	  return true;
-// 	}
-//       }
-
-//       tmp = tmp->next;
-//     }
-//   }
-
-//   return false;
-// }
-
 bool ciche_doubly_remove(struct ciche_doubly *doubly, struct ciche_doubly_node *node) {
   if (!doubly || !node || doubly->size <= 0)
     return false;
@@ -381,28 +334,20 @@ bool ciche_doubly_remove_tail(struct ciche_doubly *doubly, struct ciche_doubly_n
 }
 
 bool ciche_doubly_remove_and_free_head(struct ciche_doubly *doubly, void **obj) {
-  struct ciche_doubly_node *node = doubly->head;
-
-  return ciche_doubly_remove_and_free(doubly, node, obj);
+  return ciche_doubly_remove_and_free(doubly, doubly->head, obj);
 }
 
 
 bool ciche_doubly_remove_and_free_tail(struct ciche_doubly *doubly, void **obj) {
-  struct ciche_doubly_node *node = doubly->tail;
-
-  return ciche_doubly_remove_and_free(doubly, node, obj);
+  return ciche_doubly_remove_and_free(doubly, doubly->tail, obj);
 }
 
 bool ciche_doubly_remove_and_deep_free_head(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
-  struct ciche_doubly_node *node = doubly->head;
-
-  return ciche_doubly_remove_and_deep_free(doubly, node, obj_free);
+  return ciche_doubly_remove_and_deep_free(doubly, doubly->head, obj_free);
 }
 
 bool ciche_doubly_remove_and_deep_free_tail(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
-  struct ciche_doubly_node *node = doubly->tail;
-
-  return ciche_doubly_remove_and_deep_free(doubly, node, obj_free);
+  return ciche_doubly_remove_and_deep_free(doubly, doubly->tail, obj_free);
 }
 
 bool ciche_doubly_find_and_remove(struct ciche_doubly *doubly, void *obj, bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
@@ -433,13 +378,7 @@ bool ciche_doubly_find_and_remove_and_deep_free(struct ciche_doubly *doubly, voi
   return ciche_doubly_remove_and_deep_free(doubly, node, obj_free);
 }
 
-bool ciche_doubly_free(struct ciche_doubly *doubly) {
-  free(doubly);
-  
-  return true;
-}
-
-bool ciche_doubly_clean_and_deep_free(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
+bool ciche_doubly_clear_and_deep_free(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
   if (!doubly || doubly->size < 0)
     return false;
 
@@ -451,7 +390,7 @@ bool ciche_doubly_clean_and_deep_free(struct ciche_doubly *doubly, bool (*obj_fr
    return result;
 }
 
-bool ciche_doubly_clean_deep_free_optimized(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) {
+bool ciche_doubly_clear_deep_free_optimized(struct ciche_doubly *doubly,  bool (*obj_free)(void *)) {
   if (!doubly || doubly->size < 0)
     return false;
 
@@ -473,6 +412,12 @@ bool ciche_doubly_clean_deep_free_optimized(struct ciche_doubly *doubly,  bool (
    doubly->size = 0;
   
    return result;
+}
+
+bool ciche_doubly_free(struct ciche_doubly *doubly) {
+  free(doubly);
+  
+  return true;
 }
 
 #endif /* CICHE_DOUBLY_H */
