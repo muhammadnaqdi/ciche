@@ -6,14 +6,18 @@
 #include <stdbool.h>
 
 struct coord {
+  int label;
   int x;
   int y;
   int z;
 };
 
 struct coord *coord_create() {
+  static int counter = 0;
+  
   struct coord *tmp = (struct coord *) malloc(sizeof(struct coord));
 
+  tmp->label = ++counter;
   tmp->x = rand();
   tmp->y = rand();
   tmp->z = rand();
