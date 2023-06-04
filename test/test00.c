@@ -1,5 +1,5 @@
 #include "ciche_test.h"
-#include "../src/ciche_doubly.h"
+#include "../src/header/ciche_doubly.h"
 
 #include <stdlib.h>
 
