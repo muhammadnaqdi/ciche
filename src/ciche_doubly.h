@@ -268,51 +268,51 @@ bool ciche_doubly_find_obj(struct ciche_doubly *doubly, void *obj, bool (*obj_eq
 }
 
 /* This one is kind of tricky. Shude be used on one list at a time. I have no intention to test it.*/
-bool ciche_doubly_find_next(bool reset, struct ciche_doubly *doubly, void *obj, bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
-  static size_t found = 0;
-  if (reset)
-    found = 0;
-  int c = 0;
+// bool ciche_doubly_find_next(bool reset, struct ciche_doubly *doubly, void *obj, bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
+//   static size_t found = 0;
+//   if (reset)
+//     found = 0;
+//   int c = 0;
 
-  if (!doubly || doubly->size <= 0)
-    return false;
+//   if (!doubly || doubly->size <= 0)
+//     return false;
 
-  struct ciche_doubly_node *tmp = doubly->head;
+//   struct ciche_doubly_node *tmp = doubly->head;
 
-  if (obj_equals) {
-    while (tmp) {
-      if (obj_equals(tmp->obj, obj)) {
-	if (c < found) {
-	  c ++;
-	} else {
-	  found ++;
-	  if (node)
-	    *node = tmp;
-	  return true;
-	}
-      }
+//   if (obj_equals) {
+//     while (tmp) {
+//       if (obj_equals(tmp->obj, obj)) {
+// 	if (c < found) {
+// 	  c ++;
+// 	} else {
+// 	  found ++;
+// 	  if (node)
+// 	    *node = tmp;
+// 	  return true;
+// 	}
+//       }
 
-      tmp = tmp->next;
-    }
-  } else {
-    while (tmp) {
-      if (tmp->obj == obj) {
-	if (c < found) {
-	  c ++;
-	} else {
-	  found ++;
-	  if (node)
-	    *node = tmp;
-	  return true;
-	}
-      }
+//       tmp = tmp->next;
+//     }
+//   } else {
+//     while (tmp) {
+//       if (tmp->obj == obj) {
+// 	if (c < found) {
+// 	  c ++;
+// 	} else {
+// 	  found ++;
+// 	  if (node)
+// 	    *node = tmp;
+// 	  return true;
+// 	}
+//       }
 
-      tmp = tmp->next;
-    }
-  }
+//       tmp = tmp->next;
+//     }
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
 bool ciche_doubly_remove(struct ciche_doubly *doubly, struct ciche_doubly_node *node) {
   if (!doubly || !node || doubly->size <= 0)
