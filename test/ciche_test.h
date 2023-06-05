@@ -1,9 +1,12 @@
 #ifndef TEST_H
 #define TEST_H
 
+#include "../src/header/ciche_hash.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 struct coord {
   int id;
@@ -42,6 +45,14 @@ bool coord_equals(void *o1, void *o2) {
 
 void coord_print(struct coord *c) {
   printf("id:%d\tx:%d\ty:%d\tz:%d\n", c->id, c->x, c->y, c->z);
+}
+
+uint64_t coord_hash(void *o) {
+  struct coord *c = (struct coord *) o;
+  return ciche_hash_32(c->id)
+    ^ ciche_hash_32(c->x)
+    ^ ciche_hash_32(c->y)
+    ^ ciche_hash_32(c->z);
 }
 
 #endif /* TEST_H */

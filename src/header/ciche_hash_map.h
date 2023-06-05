@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #define HASH_MAP_SIZE 8192
+
 struct ciche_hash_map {
   struct ciche_doubly *map[HASH_MAP_SIZE];
 };
@@ -25,7 +26,7 @@ bool ciche_hash_map_add(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_h
   struct ciche_doubly *doubly = hmap->map[index];
 
   if (!doubly) {
-    doubly = (struct ciche_doubly *) malloc(sizeof(struct ciche_doubly));
+    doubly = hmap->map[index] = (struct ciche_doubly *) malloc(sizeof(struct ciche_doubly));
     if (!ciche_doubly_init(doubly))
       return false;
   }
@@ -33,14 +34,14 @@ bool ciche_hash_map_add(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_h
   return ciche_doubly_insert_at_tail(doubly, obj);
 }
 
-bool ciche_hash_find(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
+bool ciche_hash_map_find(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), struct ciche_doubly_node **node) {
   uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
 
   return ciche_doubly_find(doubly, obj, obj_equals, node);
 }
 
-bool ciche_hash_find_obj(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), void **fobj) {
+bool ciche_hash_map_find_obj(struct ciche_hash_map *hmap, void *obj, uint64_t (*obj_hash)(void *), bool (*obj_equals)(void *, void *), void **fobj) {
   uint64_t index = obj_hash ? obj_hash(obj) % HASH_MAP_SIZE : (uint64_t) obj % HASH_MAP_SIZE;
   struct ciche_doubly *doubly = hmap->map[index];
   
