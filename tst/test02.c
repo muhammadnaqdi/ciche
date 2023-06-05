@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
   puts("");
   puts("");
 
-  print;
+  print
 
   ciche_hash_map_find(hm, coords[5], &coord_hash, &coord_equals, &n);
   coord_print((struct coord *) n->obj);
@@ -48,15 +48,15 @@ int main(int argc, char *argv[]) {
   ciche_hash_map_remove(hm, coords[5], &coord_hash, &coord_equals, &n);
   coord_print((struct coord *) n->obj);
 
-  print;
+  print
 
   ciche_hash_map_remove_and_free(hm, coords[10], &coord_hash, &coord_equals);
 
-  print;
+  print
 
   ciche_hash_map_remove_and_deep_free(hm, coords[0], &coord_hash, &coord_equals, &coord_free);
 
-  print;
+  print
   
   return EXIT_SUCCESS;
 }
