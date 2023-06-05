@@ -75,7 +75,7 @@ uint64_t ciche_hash_str(char *str) {
   if (*str)
     hash = ciche_hash_8(true, (uint8_t) *(str++));
   
-  while(*str)
+  while (*str)
     hash = ciche_hash_8(false, (uint8_t) *(str++));
 
   return hash;
