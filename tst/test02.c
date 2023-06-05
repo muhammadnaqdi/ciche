@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   struct ciche_hash_map *hm = (struct ciche_hash_map *) malloc(sizeof(struct ciche_hash_map));
   ciche_hash_map_init(hm);
 
-  struct coord *coords[HASH_MAP_SIZE];
+  struct coord *coords[16];
   struct ciche_doubly *d = (struct ciche_doubly *) malloc(sizeof(struct ciche_doubly));
   struct ciche_doubly_node *n = (struct ciche_doubly_node *) malloc(sizeof(struct ciche_doubly_node));
   struct coord *c = (struct coord *) malloc(sizeof(struct coord));
