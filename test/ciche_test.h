@@ -1,5 +1,5 @@
-#ifndef TEST_H
-#define TEST_H
+#ifndef CICHE_TEST_H
+#define CICHE_TEST_H
 
 #include "../src/header/ciche_hash.h"
 
