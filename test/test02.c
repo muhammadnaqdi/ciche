@@ -31,11 +31,11 @@ int main(int argc, char *argv[]) {
     ciche_hash_map_add(hm, coords[i], &coord_hash);
   }
 
-  /*for (int i = 0; i < HASH_MAP_SIZE; ++i) {
+  for (int i = 0; i < HASH_MAP_SIZE; ++i) {
     printf("%d", hm->map[i] ? 1 : 0);
   }
   puts("");
-  puts("");*/
+  puts("");
 
   print;
 
