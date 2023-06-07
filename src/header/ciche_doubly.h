@@ -378,6 +378,30 @@ bool ciche_doubly_find_and_remove_and_deep_free(struct ciche_doubly *doubly, voi
   return ciche_doubly_remove_and_deep_free(doubly, tmp, obj_free);
 }
 
+bool ciche_doubly_clear(struct ciche_doubly *doubly) {
+  if (!doubly || doubly->size < 0)
+    return false;
+
+  bool result = true;
+
+   while (doubly->size > 0)
+     result &= ciche_doubly_remove_tail(doubly, NULL);
+   
+   return result;
+}
+
+bool ciche_doubly_clear_and_free(struct ciche_doubly *doubly) {
+  if (!doubly || doubly->size < 0)
+    return false;
+
+  bool result = true;
+
+   while (doubly->size > 0)
+     result &= ciche_doubly_remove_and_free_tail(doubly, NULL);
+   
+   return result;
+}
+
 bool ciche_doubly_clear_and_deep_free(struct ciche_doubly *doubly, bool (*obj_free)(void *)) {
   if (!doubly || doubly->size < 0)
     return false;

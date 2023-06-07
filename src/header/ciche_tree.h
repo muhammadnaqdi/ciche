@@ -6,7 +6,7 @@
 #include "ciche_queue.h"
 
 struct ciche_tree_node {
-  void **obj;
+  void *obj;
   struct ciche_tree_node *parrent;
   struct ciche_doubly *children;
 };
@@ -14,6 +14,15 @@ struct ciche_tree_node {
 struct ciche_tree {
   struct ciche_tree_node *root;
 };
+
+bool ciche_tree_init(struct ciche_tree *tree, struct ciche_tree_node *root) {
+  if (!tree || !root)
+    return false;
+
+  tree->root = root;
+
+  return true;
+}
 
 bool ciche_tree_node_init(struct ciche_tree_node *node) {
   if (!node)
@@ -26,7 +35,7 @@ bool ciche_tree_node_init(struct ciche_tree_node *node) {
   return true;
 }
 
-bool ciche_tree_add_child(struct ciche_tree_node *node, void *obj) {
+bool ciche_tree_add(struct ciche_tree_node *node, void *obj) {
   if (!node)
     false;
   
@@ -49,6 +58,23 @@ bool ciche_tree_add_child(struct ciche_tree_node *node, void *obj) {
   return ciche_doubly_insert_at_tail(node->children, new);
 }
 
+bool ciche_tree_append(struct ciche_tree_node *dest, struct ciche_tree_node *src) {
+  if (!dest || !src)
+    return false;
+  
+  if (!dest->children) {
+    if (!(dest->children = (struct ciche_doubly *) malloc(sizeof(struct ciche_doubly))))
+      return false;
+
+    if (!ciche_doubly_init(dest->children))
+      return false;
+  }
+
+  src->parrent = dest;
+  
+  return ciche_doubly_insert_at_tail(dest->children, src);
+}
+
 bool ciche_tree_dfs(struct ciche_tree_node *node, struct ciche_doubly *visit) {
   if (!node || !visit)
     return false;
@@ -67,10 +93,10 @@ bool ciche_tree_dfs(struct ciche_tree_node *node, struct ciche_doubly *visit) {
     if (!node->children)
       continue;
     
-    tmp = node->children->tail;
+    tmp = node->children->head;
     while (tmp) {
       ciche_stack_push(stack, tmp->obj);
-      tmp = tmp->prev;
+      tmp = tmp->next;
     }
   }
 
@@ -113,6 +139,8 @@ bool ciche_tree_remove(struct ciche_tree_node *node, bool (*node_equals)(void *,
   if (!p)
     return true;
 
+  node->parrent = NULL;
+  
   return ciche_doubly_find_and_remove_and_free(p->children, node, node_equals);
 }
 
