@@ -1,3 +1,6 @@
+#ifndef CICHE_HASH_H
+#define CICHE_HASH_H
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <limits.h>
@@ -80,3 +83,5 @@ uint64_t ciche_hash_str(char *str) {
 
   return hash;
 }
+
+#endif /* CICHE_HASH_H */
