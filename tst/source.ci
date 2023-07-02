@@ -1,11 +1,11 @@
-#define SIZE 5;
+#define SIZE 51;
 
 int main() {
-  int a = 5;
-  a += 2;
+  int num1 = 54;
+  num1 += SIZE;
   
-  int b = 6;
-  b = a + b;
+  int num2 = 62;
+  num1 = num2 + num1;
 
   return 0;
 }
